@@ -1,0 +1,5 @@
+pyyaml
+CFSession>=1.3.0
+beautifulsoup4
+git+https://github.com/globocom/m3u8.git
+terminology>=1.0.16

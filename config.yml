@@ -1,0 +1,13 @@
+Network:
+  #Gogoanime Base URL
+  base: https://gogoanime3
+  domain: net
+  #API Consumet for Downloadable links
+  consumet: https://api.consumet.org
+  #gogocdn, streamsb, vidstreaming [recommended]
+  consumet_video_server: vidstreaming 
+Video:
+  #1080p, 720p, 480, 360p, best
+  quality: best
+  #auto, manual
+  selection: auto
