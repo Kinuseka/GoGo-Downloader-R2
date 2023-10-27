@@ -15,5 +15,7 @@ GoGoDownloader searches and downloads anime from gogoanime website.
 ## Usage:
 
 Clone repository: `git clone https://github.com/Kinuseka/GoGo-Downloader-R2.git`
+
 Install requirements: `python3 -m pip install -r requirements.txt`
+
 Run the program: `python3 RunGoGo.py`
