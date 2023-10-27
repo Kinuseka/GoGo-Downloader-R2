@@ -8,7 +8,7 @@ GoGoDownloader searches and downloads anime from gogoanime website.
 • Homepage search
 • Genre-based search
 • Manual search
-• Bulk episodes in bulk
+• Bulk episodes downloader
 • Automatic quality selection
 ```
 
