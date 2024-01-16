@@ -85,6 +85,32 @@ def pagination_link(url, on, max, direction):
     final = append_query(url, "page", final_value)
     return final
 
+def pick_quality(m3u8_data, preferred_quality="1080p", force = False):
+    qualities = m3u8_data
+    if force:
+        for quality in qualities:
+            if quality["quality"] == preferred_quality:
+                return quality
+        else:
+            return None
+    quality_heiarchy = ["1080p", "720p", "480p", "360p", "default","backup"]
+    qualities.reverse()
+    #get backup for last
+    qualities = [ quality for quality in qualities if quality["quality"] not in ['backup','default']]
+    if preferred_quality == "best":
+        return qualities[0]
+    for quality in qualities:
+        if quality["quality"] == preferred_quality:
+            return quality
+    #Second attempt with automatic
+    for quality in qualities:
+        for qualh in quality_heiarchy:
+            if quality["quality"] ==  qualh:
+            # preferred_quality = quality_heiarchy[index+1]
+                return quality
+    else:
+        return None
+
 class RequestsClient():
     def download(self, uri, timeout=None, headers={}, verify_ssl=True):
         session = cfSession()
