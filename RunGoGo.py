@@ -1,5 +1,6 @@
-from processor import UrlFixer, UrlSearch, pagination_link, Get_ID, pretty_size, validatename, HlsObject
-from Lib import Goscraper, Prettify, EpisodeScraper, ConsumetAPI
+from processor import UrlFixer, UrlSearch, pagination_link, Get_ID, pretty_size, validatename, HlsObject, pick_quality
+from Lib import Goscraper, Prettify, EpisodeScraper, ConsumetAPI, GogoCDN
+import version
 from Varstorage import Configuration, Constants
 from pathlib import Path
 import time, os
@@ -62,11 +63,19 @@ def Download_UI(url, anime_title, episode_number):
     preprint.add_tab(char="-")
     preprint()
     video_id = Get_ID(url)
-    consumet = ConsumetAPI(base_url=config.get_consumet_api, video_id=video_id,source="vidstreaming")
-    video = consumet.get_m3u8_file(config.video_quality_preference, force=(config.video_quality_mode == "manual"))
+    if config.video_source == config.valid_video_source[1]:
+        consumet = ConsumetAPI(base_url=config.get_consumet_api, video_id=video_id,source=config.get_consumet_video_server)
+        video_data = consumet.get_m3u8_files()
+        headers = consumet.get_referrer()
+    elif config.video_source == config.valid_video_source[0]:
+        gogocdn = GogoCDN(url)
+        video_data = gogocdn.get_streaming_data()
+        video_data = video_data.get_sources()
+        headers = gogocdn.get_referrer()
+    video = pick_quality(video_data)
+    print(f"Source: {config.video_source}")
     print(f"Preferred Quality: {config.video_quality_preference}")
     print(f"Quality Selected: {video['quality']}")
-    headers = consumet.get_referrer()
     if not video:
         print("We are not able to find streamable media for this title")
         return 1
@@ -172,7 +181,9 @@ def main():
     preprint = Prettify()
     preprint.define_alignment(tabs=1)
     preprint.add_tab(lines=33)
-    preprint.add_line("\tGoGoDownloader R2")
+    preprint.define_alignment(tabs=1, spaces=5)
+    preprint.add_line(f"GoGoDownloader R2 v{version.__version__}")
+    preprint.define_alignment(tabs=1)
     preprint.add_tab(lines=33)
     preprint.add_sort(key="1",value="Search at Homepage", separator=".)")
     preprint.add_sort(key="2",value="Search by Genres", separator=".)")
@@ -187,5 +198,16 @@ def main():
         return ResultZone("Genre")
     else:
         return ResultZone("Search", value=selection)
+
+def update_checker():
+    prettify = Prettify()
+    prettify.add_tab("Update Notice",lines=50, char='-')
+    version.init()
+    notification = version.show_update(prettify=prettify)
+    prettify.add_tab(lines=50, char='-')
+    if (notification):
+        prettify()
+
 if __name__ == "__main__":
+    update_checker()
     main()
