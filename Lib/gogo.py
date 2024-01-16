@@ -108,7 +108,7 @@ class Goscraper:
             }
             scrape_data["title_name"] = title.text.strip()
             if episode:
-                scrape_data["episode"] = int(episode.text.replace("Episode ", "").strip())
+                scrape_data["episode"] = episode.text.replace("Episode ", "").strip()
             scrape_data["flair"] = flair
             scrape_res.append(scrape_data)
         return scrape_res
@@ -154,5 +154,6 @@ if __name__ == "__main__":
     print(gogo.get_result_count())
     print(gogo.get_pagination())
     print(gogo.get_genres())
+    print(gogo.parsed.prettify())
 
 
