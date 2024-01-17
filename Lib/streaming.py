@@ -1,8 +1,7 @@
 """
 GoGoDownloader.Lib.streaming
 ----------------------------
-Not fully implemented, this will be used in the future
-if we find a way to scrape video source
+Scrapes video source
 """
 
 from CFSession import cfSession
@@ -115,13 +114,4 @@ class GogoCDN:
             'id': id_encoded,
             'alias': id,
             'token': token_value
-        }
-
-if __name__ == "__main__":
-    stream = GogoCDN('https://gogoanime3.net/loop-7-kaime-no-akuyaku-reijou-wa-moto-tekikoku-de-jiyuu-kimama-na-hanayome-seikatsu-wo-mankitsu-suru-episode-2')
-    print(stream.get_streaming_data().get_sources())
-    # with open('site.html', "w", encoding="utf-8") as f:
-    #     f.write(stream.parsed.prettify())
-    # print(stream.extract_data())    
-
-    
+        }    

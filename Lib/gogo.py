@@ -147,13 +147,3 @@ class Goscraper:
             genre_scraped["flair"] = flair
             genre_processed_data.append(genre_scraped)
         return genre_processed_data
-    
-if __name__ == "__main__":
-    gogo = Goscraper('https://gogoanime.vc')
-    print(gogo.get_titles())
-    print(gogo.get_result_count())
-    print(gogo.get_pagination())
-    print(gogo.get_genres())
-    print(gogo.parsed.prettify())
-
-
