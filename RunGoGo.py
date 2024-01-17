@@ -72,7 +72,7 @@ def Download_UI(url, anime_title, episode_number):
         video_data = gogocdn.get_streaming_data()
         video_data = video_data.get_sources()
         headers = gogocdn.get_referrer()
-    video = pick_quality(video_data)
+    video = pick_quality(video_data, preferred_quality=config.video_quality_preference, force=(config.video_quality_mode == "manual"))
     print(f"Source: {config.video_source}")
     print(f"Preferred Quality: {config.video_quality_preference}")
     print(f"Quality Selected: {video['quality']}")
