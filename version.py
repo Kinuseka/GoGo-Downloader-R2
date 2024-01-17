@@ -9,7 +9,7 @@
 import requests
 import time
 from Lib.prettier import Prettify
-__version_info__ = (1, 1, 0, 'final', 0)
+__version_info__ = (1, 1, 1, 'final', 0)
 
 def _get_version(version_info, implicit=False):
     " Returns a PEP 440-compliant version number from version_info. "
@@ -126,7 +126,7 @@ def show_update(prettify: Prettify):
     broadcast = UpdateInformation.Broadcast
     targeted = Targeted_Msg(CurrentVersion(), UpdateInformation.Targeted)
     if version_notice and any((message, broadcast, targeted)):
-        prettify.add_tab(lines="10", char="-")
+        prettify.add_tab("Message",lines=50, char='-')
     if all((new_update, message)) or all((future_update, message)):
         saved = prettify.alignment
         prettify.define_alignment()
