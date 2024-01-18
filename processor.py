@@ -340,10 +340,3 @@ class Downloader_child(threading.Thread):
         else:
             self.progress["done"] = True
             self.progress["error"] = last_exception
-
-if __name__ == "__main__":
-    hls = HlsObject("https://www041.vipanicdn.net/streamhls/04d139ee5086804474adaefc664a7927/ep.4.1697767391.480.m3u8", file_name='temporary_name.mp4',headers={"Referer":"https://goone.pro/streaming.php?id=MzgzMTc=&title=Steins%3BGate+Episode+1"})
-    # print(hls.segments)
-    hls.download()
-    hls.download_progress()
-    hls.arrange_files() 
