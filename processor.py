@@ -86,30 +86,27 @@ def pagination_link(url, on, max, direction):
     return final
 
 def pick_quality(m3u8_data, preferred_quality="1080p", force = False):
-    qualities = m3u8_data
-    if force:
-        for quality in qualities:
-            if quality["quality"] == preferred_quality:
-                return quality
-        else:
-            return None
-    quality_heiarchy = ["1080p", "720p", "480p", "360p", "default","backup"]
+    qualities = [ quality for quality in m3u8_data if quality["quality"] not in ['backup','default']]
     qualities.reverse()
-    #get backup for last
-    qualities = [ quality for quality in qualities if quality["quality"] not in ['backup','default']]
+    quality_heiarchy = ["1080p", "720p", "480p", "360p", "default","backup"]
     if preferred_quality == "best":
         return qualities[0]
     for quality in qualities:
         if quality["quality"] == preferred_quality:
             return quality
-    #Second attempt with automatic
-    for quality in qualities:
-        for qualh in quality_heiarchy:
-            if quality["quality"] ==  qualh:
-            # preferred_quality = quality_heiarchy[index+1]
-                return quality
     else:
+        if not force:    
+            #Second attempt with automatic
+            for quality in qualities:
+                for qualh in quality_heiarchy:
+                    if quality["quality"] ==  qualh:
+                        #preferred_quality = quality_heiarchy[index+1]
+                        return quality
         return None
+
+def list_quality(m3u8_data):
+    return list(reversed([quality['quality'] for quality in m3u8_data if quality["quality"] not in ['backup','default']]))
+
 
 class RequestsClient():
     def download(self, uri, timeout=None, headers={}, verify_ssl=True):
