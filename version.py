@@ -9,7 +9,7 @@
 import requests
 import time
 from Lib.prettier import Prettify
-__version_info__ = (1, 1, 1, 'final', 0)
+__version_info__ = (1, 2, 0, 'final', 0)
 
 def _get_version(version_info, implicit=False):
     " Returns a PEP 440-compliant version number from version_info. "
@@ -68,13 +68,31 @@ def ConstructVersion(Version: list):
     return f"{Version[0]}.{Version[1]}.{Version[2]}"
 
 def Comparator(version, remote):
-    ftr,new = False, False
-    for cur_ver, rem_ver in zip(version, remote):
-        if cur_ver < rem_ver:
-            new = True
-        if cur_ver > rem_ver:
-            ftr = True
-    return new, ftr
+    v1_parts = version
+    v2_parts = remote
+    new_version = False
+    ftr_version = False
+    for num, (v1, v2) in enumerate(zip(v1_parts, v2_parts)):
+        if num == 0:
+            if v1 > v2:
+                ftr_version = True
+            elif v1 < v2:
+                new_version = True
+        elif num == 1:
+            if new_version or ftr_version:
+                break
+            elif v1 > v2:
+                ftr_version = True
+            elif v1 < v2:
+                new_version = True
+        elif num == 2:
+            if new_version or ftr_version:
+                break
+            elif v1 > v2:
+                ftr_version = True
+            elif v1 < v2:
+                new_version = True
+    return new_version, ftr_version
 
 def Targeted_Msg(client_version, targeted):
     if targeted:
@@ -111,7 +129,7 @@ def show_update(prettify: Prettify):
         prettify.add_line(f'Could not fetch update details from: {UpdateInformation.Version_Host}')
         notification = True
         return notification
-    new_update, future_update = Comparator(CurrentVersion(), RemoteVersion())
+    new_update, future_update = Comparator(CurrentVersion()[:3], RemoteVersion())
     if new_update:
         prettify.add_line(f"A New Version is available!")
         prettify.add_line(f"Your version: v{ConstructVersion(CurrentVersion())} | Latest version: v{ConstructVersion(RemoteVersion())}")
