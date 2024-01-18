@@ -1,4 +1,14 @@
-from processor import UrlFixer, UrlSearch, pagination_link, Get_ID, pretty_size, validatename, HlsObject, pick_quality
+from processor import (
+                        UrlFixer, 
+                        UrlSearch, 
+                        pagination_link,
+                        Get_ID, 
+                        pretty_size, 
+                        validatename, 
+                        HlsObject, 
+                        pick_quality, 
+                        list_quality
+)
 from Lib import Goscraper, Prettify, EpisodeScraper, ConsumetAPI, GogoCDN
 import version
 from Varstorage import Configuration, Constants
@@ -8,6 +18,9 @@ from terminology import in_green
 
 config = Configuration().load()
 config.self_check()
+
+#GlobalVar
+chosen_quality_manual = None
 
 def user_input(text, valid: list, msg="Enter valid variables"):
     "Get a list of valid integers, add any on list to allow any input other than blank or whitespace"
@@ -72,15 +85,32 @@ def Download_UI(url, anime_title, episode_number):
         video_data = gogocdn.get_streaming_data()
         video_data = video_data.get_sources()
         headers = gogocdn.get_referrer()
-    video = pick_quality(video_data, preferred_quality=config.video_quality_preference, force=(config.video_quality_mode == "manual"))
+    global chosen_quality_manual
+    if config.video_quality_mode == "manual" and not chosen_quality_manual:
+        qualities = list_quality(video_data)
+        prettyqual = Prettify()
+        prettyqual.define_alignment(tabs=1)
+        prettyqual.add_line("Manual Mode enabled")
+        prettyqual.add_tab(data="Available Quality",char="-")
+        for quality in qualities:
+            prettyqual.add_line(quality)
+        prettyqual.add_tab(char="-")
+        prettyqual()
+        quality = user_input("Select Quality:", valid=qualities, msg="Incorrect input")
+        chosen_quality_manual = quality
+        video = pick_quality(video_data, preferred_quality=quality, force=True)
+    elif chosen_quality_manual:
+        video = pick_quality(video_data, preferred_quality=chosen_quality_manual, force=True)
+    elif config.video_quality_mode == "auto":
+        video = pick_quality(video_data, preferred_quality=config.video_quality_preference)
     print(f"Source: {config.video_source}")
-    print(f"Preferred Quality: {config.video_quality_preference}")
+    if config.video_quality_mode != "manual": print(f"Preferred Quality: {config.video_quality_preference}")
     print(f"Quality Selected: {video['quality']}")
     if not video:
         print("We are not able to find streamable media for this title")
         return 1
     #Download the file
-    file_name = validatename(f"{anime_title}_{episode_number}")
+    file_name = validatename(f"{anime_title}_{video['quality']}_{episode_number}")
     hls = HlsObject(m3u8_url=video['url'], headers=headers,file_name=file_name, download_location=os.path.join(Constants.download_folder, validatename(anime_title)))
     hls.download() #Initiate download
     print(f"Downloading: {anime_title}")
