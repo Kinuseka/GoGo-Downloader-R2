@@ -1,11 +1,14 @@
 from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
 from collections.abc import Callable, Iterable, Mapping
+
+import requests.structures
 from Varstorage import Configuration, Constants
-from CFSession import cfSession, cfexception
+from CFSession import cfSession
 from requests.exceptions import RequestException
 from typing import Any
 from pathlib import Path
 import threading
+import requests
 import shutil
 import m3u8
 import pickle
@@ -305,8 +308,9 @@ class Downloader_child(threading.Thread):
             "done": False,
             "file_size": 0
         }
-        self.session = cfSession()
-        self.session.session.headers = headers
+        self.headers = requests.structures.CaseInsensitiveDict(headers)
+        if not self.headers.get("User-Agent"):
+            self.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0"
         Path(self.directory).mkdir(parents=True, exist_ok=True)
 
     def file_open(self):
@@ -324,7 +328,7 @@ class Downloader_child(threading.Thread):
             recorded_chunks = 0
             with open(os.path.join(self.directory, self.final_name), "wb") as f:
                 try:
-                    response_stream = self.session.get(self.url, stream=True, timeout=120)
+                    response_stream = requests.get(self.url, stream=True, timeout=10, headers=self.headers)
                     for chunks in response_stream.iter_content(chunk_size=4096):
                         f.write(chunks)
                         recorded_chunks += len(chunks)
@@ -333,7 +337,7 @@ class Downloader_child(threading.Thread):
                         self.progress["done"] = True
                         self.semaphore.release()
                         break
-                except (cfexception.CFException, RequestException) as e:
+                except RequestException as e:
                     print(f"thr: {self.segment_id} Attempt {i+1}/5: Error: {e}")
                     self.progress["file_size"] -= recorded_chunks
                     last_exception = e
