@@ -9,7 +9,7 @@
 import requests
 import time
 from Lib.prettier import Prettify
-__version_info__ = (1, 2, 0, 'final', 0)
+__version_info__ = (1, 2, 1, 'final', 0)
 
 def _get_version(version_info, implicit=False):
     " Returns a PEP 440-compliant version number from version_info. "
